@@ -18,5 +18,3 @@ composer.lock
 phpunit.xml
 server.php
 tests/
-webpack.mix.js
-artisan
