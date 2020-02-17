@@ -18,4 +18,3 @@ tests/
 .styleci.yml
 README.md
 composer.lock
-package-lock.json
