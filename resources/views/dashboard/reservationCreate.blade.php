@@ -3,6 +3,14 @@
 @section('title', 'Create reservation')
 @section('content')
 <div class="container my-5">
+	@if(Route::has('login'))
+	      <div class="ml-auto">
+	        @auth
+	         <h2> <center> Welcome {{{ isset(Auth::user()->first_name) ? Auth::user()->first_name : 'User' }}} {{{ isset(Auth::user()->last_name) ? Auth::user()->last_name : "" }}} ! </center></h2>
+	        @endauth
+	      </div>      
+	    @endif
+	    <br>
     <div class="card">
         <div class="card-header">
             <h2>{{ $hotelInfo->name }} - <small class="text-muted">{{ $hotelInfo->location }}</small></h2>
@@ -26,7 +34,7 @@
                     <div class="col-sm-4">
                         <div class="form-group">
                             <label for="guests">Number of guests</label>
-                            <input class="form-control" name="num_of_guests" placeholder="1">
+                            <input class="form-control" name="num_of_guests" placeholder="Number of guests">
                         </div>
                     </div>
                     <div class="col-sm-6">
@@ -43,8 +51,16 @@
                     </div>
                 </div>
                 <button type="submit" class="btn btn-lg btn-primary">Book it</button>
+
+                <input type="text" id="title" name="title" value="{{ $hotelInfo->name }}" hidden> 
+                <input type="text" id="description" name="description" value="{{ $hotelInfo->description }}" hidden>
+                <input type="text" id="location" name="location" value="{{ $hotelInfo->location }}" hidden>
             </form>
         </div>
     </div>
+    <br>
+    <div class="card">
+     <a href="{{url('/dashboard/reservations')}}" class="btn btn-lg btn-primary">My Reservations</a>
+   </div>
 </div>
 @endsection

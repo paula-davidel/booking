@@ -2,6 +2,11 @@
 @section('title', 'Reservations')
 @section('content')
 <div class="container mt-5">
+    <div class="row">
+         <a href="{{url('/dashboard')}}" class="btn btn-primary">Back</a>
+    </div>
+    <div class="row">
+             <br>
     <h2>Your Reservations</h2>
     <table class="table mt-3">
         <thead>
@@ -16,7 +21,7 @@
             </tr>
         </thead>
         <tbody>
-            @foreach ($reservations as $reservation)
+            @foreach($reservations as $reservation)
             <tr>
                 <td>{{ $reservation->room->hotel['name'] }}</td>
                 <td>{{ $reservation->arrival }}</td>
@@ -35,5 +40,6 @@
     @if(!empty(Session::get('error')))
         <div class="alert alert-danger"> {{ Session::get('error') }}</div>
     @endif
+</div>
 </div>
 @endsection

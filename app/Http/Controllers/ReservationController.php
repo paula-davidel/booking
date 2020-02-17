@@ -7,6 +7,9 @@ use Illuminate\Support\Facades\DB;
 use App\Reservation;
 use App\Hotel;
 use App\Room;
+use App\Trip;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 
 class ReservationController extends Controller
 {
@@ -19,6 +22,7 @@ class ReservationController extends Controller
     {
        $reservations = Reservation::with('room', 'room.hotel')
         ->orderBy('arrival', 'asc')
+        ->where('user_id', Auth::id())
         ->get();
 
       return view('dashboard.reservations')->with('reservations', $reservations);
@@ -33,6 +37,7 @@ class ReservationController extends Controller
     public function create($hotel_id)
     {
       $hotelInfo = Hotel::with('rooms')->get()->find($hotel_id);
+
       return view('dashboard.reservationCreate', compact('hotelInfo'));
     }
 
@@ -43,10 +48,31 @@ class ReservationController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
-    {
-      $request->request->add(['user_id' => 1]);
-      Reservation::create($request->all());
+    {      
 
+      $dataForReservation= [
+        'room_id' => $request->room_id,
+        'user_id' => Auth::id(),
+        'num_of_guests' => $request->num_of_guests,
+        'arrival' => $request->arrival,
+        'departure' => $request->departure,
+      ];
+      Reservation::create($dataForReservation);
+      
+      $room_price = Room::where('id', $request->room_id)->first();
+
+      $dataForTrip = [
+        'title' => $request->title,
+        'description' => $request->description,
+        'start_date' => $request->arrival,
+        'end_date' => $request->departure,
+        'location' => $request->location,
+        'price' => $room_price->price,
+      ];
+
+      $slug = Str::slug($request->title, '_');
+      $dataForTrip['slug'] =$slug;
+      Trip::create($dataForTrip);
       return redirect('dashboard/reservations')->with('success', 'Reservation created!');
     }
 
@@ -90,7 +116,7 @@ class ReservationController extends Controller
      */
     public function update(Request $request, Reservation $reservation)
     {
-      $reservation->user_id = 1;
+      $reservation->user_id = Auth::id();
 
       $reservation->save();
       return redirect('dashboard/reservations')->with('success', 'Successfully updated your reservation!');

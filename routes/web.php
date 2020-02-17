@@ -20,3 +20,5 @@ Route::group(['prefix' => 'dashboard'], function() {
     Route::resource('reservations', 'ReservationController')->except('create');
 });
 Auth::routes();
+Route::resource('users', 'UserController');
+Route::resource('trips', 'TripController');

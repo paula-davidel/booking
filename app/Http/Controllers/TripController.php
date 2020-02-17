@@ -3,20 +3,20 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\User;
-use Illuminate\Support\Facades\Hash;
+use App\Trip;
+use Illuminate\Support\Str;
 
-class UserController extends Controller
+class TripController extends Controller
 {
-    /**
+   /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
     public function index()
     {
-        $user = User::all();
-        return view('auth.index_user', compact('user'));
+        $trip = Trip::all();
+        return view('trip.index_trip', compact('trip'));
     }
 
     /**
@@ -26,7 +26,7 @@ class UserController extends Controller
      */
     public function create()
     {
-        return view('auth.create');
+        return view('trip.create');
     }
 
     /**
@@ -38,16 +38,18 @@ class UserController extends Controller
     public function store(Request $request)
     {
         $storeData = $request->validate([
-            'first_name' => 'required|max:255',
-            'last_name' => 'required|max:255',
-            'email' => 'required|email|unique:users,email|max:255',
-            'password' => 'required|unique:users,password|min:8',
+            'price' => 'required|numeric',
+            'title' => 'required|max:255',
+            'description' => 'required',
+            'start_date' => 'required',
+            'end_date' => 'required',
+            'location' => 'required|max:255',
         ]);
-        $storeData['password'] = Hash::make($request->password);
+        $slug = Str::slug($storeData['title'], '_');
+        $storeData['slug'] =$slug;
+        $trip = Trip::create($storeData);
 
-        $user = User::create($storeData);
-
-        return redirect('/users')->with('completed', 'User has been saved!');
+        return redirect('/trips')->with('completed', 'Trip has been saved!');
     }
 
 
@@ -70,8 +72,8 @@ class UserController extends Controller
      */
     public function edit($id)
     {
-        $user = User::findOrFail($id);
-        return view('auth.edit', compact('user'));
+        $trip = Trip::findOrFail($id);
+        return view('trip.edit', compact('trip'));
     }
 
     /**
@@ -84,16 +86,17 @@ class UserController extends Controller
     public function update(Request $request, $id)
     {
         $updateData = $request->validate([
-            'first_name' => 'required|max:255',
-            'last_name' => 'required|max:255',
-            'email' => 'required|email|max:255',
-            'password' => 'required|min:8',
+            'price' => 'required|numeric',
+            'title' => 'required|max:255',
+            'description' => 'required',
+            'start_date' => 'required',
+            'end_date' => 'required',
+            'location' => 'required|max:255',
         ]);
-
-        $updateData['password'] = Hash::make($request->password);
-
-        User::whereId($id)->update($updateData);
-        return redirect('/users')->with('completed', 'User has been updated');
+        $slug = Str::slug($updateData['title'], '_');
+        $updateData['slug'] =$slug;
+        Trip::whereId($id)->update($updateData);
+        return redirect('/trips')->with('completed', 'Trip has been updated');
     }
 
     /**
@@ -104,9 +107,9 @@ class UserController extends Controller
      */
     public function destroy($id)
     {
-        $user = User::findOrFail($id);
-        $user->delete();
+        $trip = Trip::findOrFail($id);
+        $trip->delete();
 
-        return redirect('/users')->with('completed', 'User has been deleted');
+        return redirect('/trips')->with('completed', 'Trip has been deleted');
     }
 }

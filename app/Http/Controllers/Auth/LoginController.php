@@ -33,7 +33,8 @@ class LoginController extends Controller
      */
     protected $redirectTo = RouteServiceProvider::HOME;
     protected $username = 'email';
-
+    protected $maxLoginAttempts = 5; // Amount of bad attempts user can make
+    protected $lockoutTime = 300; // Time for which user is going to be blocked in seconds
     /**
      * Create a new controller instance.
      *
@@ -46,12 +47,14 @@ class LoginController extends Controller
    
     public function login(Request $request)
     {
-        $email = $request->email;
-        $password = md5($request->password);
-        if (Auth::attempt(['email' => $email, 'password' => $password])){
-            return redirect('dashboard');
-        } else {
-               return redirect()->back();
+        $credentials = $request->only('email', 'password');
+        
+        if (Auth::attempt($credentials)) {
+            return redirect()->intended('dashboard');
+        }
+        else
+        {
+           return redirect()->back();
         }
     }
 
